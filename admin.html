@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Table View</title>
+    <style>
+        /* Modern CSS Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --gradient-1: linear-gradient(135deg, #6366f1, #8b5cf6);
+            --gradient-2: linear-gradient(45deg, #3b82f6, #2dd4bf);
+            --shadow-color: rgba(99, 102, 241, 0.15);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #fafafa;
+            color: #0f172a;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Innovative Header Design */
+        .dashboard-header {
+            background: var(--gradient-1);
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .dashboard-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
+            animation: rotate 20s linear infinite;
+        }
+
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: glowText 3s ease-in-out infinite;
+            text-align: center;
+        }
+
+        /* Search and Clear Container */
+        .search-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-wrapper {
+            display: flex;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 45px 12px 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 2px 15px rgba(99, 102, 241, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            color: #6366f1;
+            pointer-events: none;
+        }
+
+        .clear-button {
+            background: var(--gradient-1);
+            height: 45px;
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 10px var(--shadow-color);
+            margin-left: 15px;
+        }
+
+        .clear-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Employee Table Styles */
+        .employee-table-container {
+            padding: 0 2rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeScale 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        .employee-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: white;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .employee-table th,
+        .employee-table td {
+            padding: 1.25rem;
+            text-align: left;
+        }
+
+        .employee-table th {
+            background: #f1f5f9;
+            color: #334155;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .employee-table tr {
+            transition: all 0.3s ease;
+        }
+
+        .employee-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .employee-table td {
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .employee-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .view-button {
+            background: transparent;
+            border: 1px solid #6366f1;
+            cursor: pointer;
+            color: #6366f1;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .view-button:hover {
+            background: rgba(99, 102, 241, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .view-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-block;
+            text-align: center;
+            min-width: 100px;
+        }
+
+        .status-in {
+            background: linear-gradient(135deg, #34d399, #10b981);
+            color: white;
+            animation: pulseGlow 2s infinite;
+        }
+
+        .status-out {
+            background: linear-gradient(135deg, #fb923c, #f97316);
+            color: white;
+        }
+
+        /* Employee Detail Overlay */
+        .employee-detail-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .employee-detail-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .employee-detail-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .employee-detail-overlay.active .employee-detail-card {
+            transform: translateY(0);
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .employee-detail-title {
+            color: #1a365d;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            color: #4a5568;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 1.5rem;
+            line-height: 1;
+            transition: color 0.3s ease;
+        }
+
+        .close-button:hover {
+            color: #1a365d;
+        }
+
+        .detail-info {
+            margin-bottom: 2rem;
+        }
+
+        .info-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        .info-label {
+            color: #4a5568;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-value {
+            color: #1a365d;
+            font-size: 1.125rem;
+            font-weight: 500;
+        }
+
+        .time-records {
+            margin-top: 2rem;
+        }
+
+        .time-record {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .time-label {
+            color: #4a5568;
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .time-value {
+            color: #1a365d;
+            font-weight: 500;
+        }
+
+        .duration {
+            color: #48bb78;
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        /* No Records Found Style */
+        .no-records {
+            text-align: center;
+            padding: 3rem;
+            color: #64748b;
+            font-size: 1.125rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin-left: 150%;
+            width: 100%;
+        }
+
+        .no-records-icon {
+            width: 100px;
+            height: 100px;
+            color: #cbd5e1;
+        }
+
+        /* Enhanced Animations */
+        @keyframes glowText {
+            0%, 100% {
+                text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+            }
+            50% {
+                text-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+            }
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulseGlow {
+            0% {
+                box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(52, 211, 153, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+            }
+        }
+
+        /* Modern Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 5px;
+            border: 2px solid #f1f5f9;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                padding: 2rem 1rem;
+                text-align: center;
+            }
+
+            .dashboard-title {
+                font-size: 2rem;
+                margin: 0;
+            }
+
+            .search-container {
+                flex-direction: column;
+                gap: 15px;
+                padding: 0 1rem;
+            }
+
+            .search-wrapper {
+                width: 100%;
+            }
+
+            .clear-button {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .employee-table-container {
+                padding: 0 1rem;
+            }
+
+            .employee-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            .employee-table th,
+            .employee-table td {
+                padding: 1rem 0.75rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-title {
+                font-size: 1.5rem;
+            }
+
+            .search-input,
+            .clear-button {
+                font-size: 0.875rem;
+            }
+
+            .employee-table-container {
+                padding: 0 0.5rem;
+            }
+
+            .employee-table th,
+            .employee-table td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.875rem;
+            }
+
+            .status-badge {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.75rem;
+                min-width: 80px;
+            }
+
+            .view-button {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">ADMIN ATTENDANCE</h1>
+    </div>
+    
+    <!-- Search and Clear Container -->
+    <div class="search-container">
+        <div class="search-wrapper">
+            <input type="text" id="searchInput" class="search-input" placeholder="Search by Name or ID...">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+        </div>
+        <button class="clear-button" onclick="window.location.href='index.html';">
+            Click Here For EmployView</button>
+        <button class="clear-button" onclick="showModal()">Clear All Records</button>
+    </div>
+    
+    <!-- Employee Table -->
+    <div class="employee-table-container">
+        <table class="employee-table" id="employeeTable">
+            <thead>
+                <tr>
+                    <th>Employee Name</th>
+                    <th>Employee ID</th>
+                    <th>Employee Status</th>
+                    <th>Last Update</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="employeeTableBody">
+                <!-- Table rows will be dynamically inserted here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Employee Detail Overlay -->
+    <div class="employee-detail-overlay" id="employeeDetailOverlay">
+        <div class="employee-detail-card">
+            <div class="detail-header">
+                <h2 class="employee-detail-title">Employee Details</h2>
+                <button class="close-button" onclick="hideEmployeeDetail()">×</button>
+            </div>
+            <div class="detail-info" id="employeeDetailContent">
+                <!-- Content will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to calculate the duration between in-time and out-time
+        function calculateDuration(inTime, outTime) {
+            if (!inTime || !outTime) return 'N/A';
+            
+            const start = new Date(`1970/01/01 ${inTime}`);
+            const end = new Date(`1970/01/01 ${outTime}`);
+            
+            const diff = end - start;
+            const hours = Math.floor(diff / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            
+            return `${hours}h ${minutes}m`;
+        }
+
+        // Function to get the day of the week from a date string
+        function getDayName(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { weekday: 'long' });
+        }
+
+        // Show the details of a specific employee
+        function showEmployeeDetail(employeeId) {
+            const records = JSON.parse(localStorage.getItem('punchRecords') || '[]');
+            const employeeRecords = records.filter(record => record.id === employeeId);
+            
+            if (employeeRecords.length === 0) return;
+
+            const latestRecord = employeeRecords[employeeRecords.length - 1];
+            const dayRecords = new Map();
+
+            // Group records by date
+            employeeRecords.forEach(record => {
+                if (!dayRecords.has(record.date)) {
+                    dayRecords.set(record.date, {
+                        date: record.date,
+                        day: getDayName(record.date),
+                        inTime: record.status === 'in' ? record.timestamp : null,
+                        outTime: record.status === 'out' ? record.timestamp : null
+                    });
+                } else {
+                    const dayRecord = dayRecords.get(record.date);
+                    if (record.status === 'in') dayRecord.inTime = record.timestamp;
+                    if (record.status === 'out') dayRecord.outTime = record.timestamp;
+                }
+            });
+
+            const detailContent = document.getElementById('employeeDetailContent');
+            detailContent.innerHTML = ` 
+                <div class="info-row">
+                    <div class="info-item">
+                        <div class="info-label">Employee Name</div>
+                        <div class="info-value">${latestRecord.name}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Employee ID</div>
+                        <div class="info-value">${latestRecord.id}</div>
+                    </div>
+                </div>
+
+                <h3 style="margin: 2rem 0 1rem;">Attendance Records</h3>
+                ${Array.from(dayRecords.values()).reverse().map(record => ` 
+                    <div class="time-record">
+                        <div>
+                            <div class="time-label">Date</div>
+                            <div class="time-value">${record.date}</div>
+                        </div>
+                        <div>
+                            <div class="time-label">Day</div>
+                            <div class="time-value">${record.day}</div>
+                        </div>
+                        <div>
+                            <div class="time-label">Punch In</div>
+                            <div class="time-value">${record.inTime || 'N/A'}</div>
+                        </div>
+                        <div>
+                            <div class="time-label">Punch Out</div>
+                            <div class="time-value">${record.outTime || 'N/A'}</div>
+                        </div>
+                        <div>
+                            <div class="time-label">Duration</div>
+                            <div class="duration">${calculateDuration(record.inTime, record.outTime)}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+
+            const overlay = document.getElementById('employeeDetailOverlay');
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Hide the employee detail overlay
+        function hideEmployeeDetail() {
+            const overlay = document.getElementById('employeeDetailOverlay');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Update the employee table with search functionality
+        function updateEmployeeTable() {
+            const records = JSON.parse(localStorage.getItem('punchRecords') || '[]');
+            const today = new Date().toLocaleDateString();
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            
+            // Get the latest status for each employee for today
+            const latestRecords = new Map();
+            records.forEach(record => {
+                if (record.date === today) {
+                    latestRecords.set(record.id, record);
+                }
+            });
+            
+            // Filter records based on search query
+            const filteredRecords = Array.from(latestRecords.values()).filter(record => 
+                record.name.toLowerCase().includes(searchQuery) || 
+                record.id.toLowerCase().includes(searchQuery)
+            );
+
+            const tableBody = document.getElementById('employeeTableBody');
+            
+            if (filteredRecords.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="no-records">
+                            <svg class="no-records-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            No Records Found
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tableBody.innerHTML = filteredRecords
+                .map((record, index) => ` 
+                    <tr>
+                        <td>${record.name}</td>
+                        <td>${record.id}</td>
+                        <td><span class="status-badge ${record.status === 'in' ? 'status-in' : 'status-out'}">
+                            ${record.status.charAt(0).toUpperCase() + record.status.slice(1)}
+                        </span></td>
+                        <td>${record.timestamp}</td>
+                        <td>
+                            <button class="view-button" onclick="showEmployeeDetail('${record.id}')">
+                                <svg class="view-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                View
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+        }
+
+        // Initialize search input event listener
+        document.getElementById('searchInput').addEventListener('input', updateEmployeeTable);
+
+        // Initial call to populate the employee table when the page loads
+        updateEmployeeTable();
+
+        // Function to show the modal to confirm clearing records
+        function showModal() {
+            const confirmClear = confirm("Are you sure you want to clear all records?");
+            if (confirmClear) {
+                clearRecords();
+            }
+        }
+
+        // Function to clear all records from localStorage
+        function clearRecords() {
+            localStorage.removeItem('punchRecords');
+            updateEmployeeTable(); // Refresh the employee table to reflect the cleared records
+            alert("All records have been cleared!");
+        }
+
+        // Close the detail overlay when clicking outside the card
+        document.getElementById('employeeDetailOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideEmployeeDetail();
+            }
+        });
+    </script>
+</body>
+</html>
